@@ -9,14 +9,18 @@
     tools:context=".AddInventory">
 
     <ImageView
-        android:id="@+id/imageView6"
+        android:id="@+id/fruitcap"
         android:layout_width="125dp"
         android:layout_height="118dp"
         android:layout_marginTop="36dp"
         android:background="@drawable/camera"
+        android:clickable="true"
+        android:focusable="true"
+        android:onClick="onImageViewClicked"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/addinvHead" />
+
 
     <TextView
         android:id="@+id/addinvHead"
@@ -45,7 +49,7 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.144"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/imageView6" />
+        app:layout_constraintTop_toBottomOf="@+id/fruitcap" />
 
     <TextView
         android:id="@+id/quantityhead"
@@ -100,7 +104,7 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.428"
         app:layout_constraintStart_toEndOf="@+id/itemHead"
-        app:layout_constraintTop_toBottomOf="@+id/imageView6" />
+        app:layout_constraintTop_toBottomOf="@+id/fruitcap" />
 
     <EditText
         android:id="@+id/quantityInput"

@@ -56,15 +56,14 @@
         android:id="@+id/timetext"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginStart="225dp"
         android:layout_marginTop="16dp"
         android:fontFamily="@font/poppins_bold"
         android:text="Time Period"
         android:textColor="#152015"
         android:textSize="20sp"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.578"
-        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintHorizontal_bias="0.536"
+        app:layout_constraintStart_toEndOf="@+id/soiltext"
         app:layout_constraintTop_toBottomOf="@+id/landInput" />
 
     <TextView
@@ -138,10 +137,10 @@
         android:layout_width="177dp"
         android:layout_height="40dp"
         android:textSize="20sp"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/timetext"
-        app:layout_constraintVertical_bias="0.0"
-        tools:layout_editor_absoluteX="209dp" />
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.458"
+        app:layout_constraintStart_toEndOf="@+id/soilInput"
+        app:layout_constraintTop_toBottomOf="@+id/timetext" />
 
     <AutoCompleteTextView
         android:id="@+id/countryInput"
@@ -158,7 +157,6 @@
         android:layout_width="192dp"
         android:layout_height="38dp"
         android:layout_marginTop="32dp"
-        android:layout_marginEnd="20dp"
         android:textSize="20sp"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.384"
@@ -191,12 +189,12 @@
         android:id="@+id/restext"
         android:layout_width="354dp"
         android:layout_height="204dp"
-        android:layout_marginTop="8dp"
+        android:layout_marginTop="12dp"
         android:fontFamily="@font/poppins_bold"
         android:textColor="#152015"
         android:textSize="20sp"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.438"
+        app:layout_constraintHorizontal_bias="0.526"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/resbutton" />
 
@@ -204,14 +202,13 @@
         android:id="@+id/landInput"
         android:layout_width="157dp"
         android:layout_height="44dp"
-        android:layout_marginStart="225dp"
         android:layout_marginTop="12dp"
         android:hint="(in Acres)"
         android:inputType="number"
         android:textSize="20sp"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.144"
-        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintStart_toEndOf="@+id/landtext"
         app:layout_constraintTop_toBottomOf="@+id/kyltitle" />
 
     <Button
@@ -230,21 +227,21 @@
         android:id="@+id/seasontext"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginStart="270dp"
+        android:layout_marginStart="84dp"
         android:layout_marginTop="16dp"
         android:fontFamily="@font/poppins_bold"
         android:text="Season"
         android:textColor="#152015"
         android:textSize="20sp"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintHorizontal_bias="0.171"
+        app:layout_constraintStart_toEndOf="@+id/countrytext"
         app:layout_constraintTop_toBottomOf="@+id/timeInput" />
 
     <AutoCompleteTextView
         android:id="@+id/seasonInput"
         android:layout_width="210dp"
         android:layout_height="35dp"
-        android:layout_marginEnd="20dp"
         android:textSize="20sp"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.642"

@@ -1,35 +1,39 @@
 package com.example.krishakai;
 
-import androidx.annotation.NonNull;
-import androidx.appcompat.app.AppCompatActivity;
-import androidx.core.app.ActivityCompat;
+import static com.example.krishakai.BuildConfig.WEATHER_KEY;
 
-import android.content.Context;
+import android.Manifest;
 import android.content.pm.PackageManager;
 import android.location.Address;
 import android.location.Geocoder;
 import android.location.Location;
-import android.location.LocationManager;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.View;
-import android.view.WindowManager;
 import android.widget.ImageView;
 import android.widget.ProgressBar;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import androidx.activity.EdgeToEdge;
+import androidx.annotation.NonNull;
+import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.app.ActivityCompat;
+import androidx.core.graphics.Insets;
+import androidx.core.view.ViewCompat;
+import androidx.core.view.WindowInsetsCompat;
+
 import com.android.volley.Request;
 import com.android.volley.RequestQueue;
+import com.android.volley.Response;
 import com.android.volley.VolleyError;
 import com.android.volley.toolbox.JsonObjectRequest;
 import com.android.volley.toolbox.Volley;
-import com.android.volley.Response;
-import com.google.android.material.textfield.TextInputEditText;
+import com.google.android.gms.location.FusedLocationProviderClient;
+import com.google.android.gms.location.LocationServices;
+import com.google.android.gms.tasks.OnSuccessListener;
+import com.google.android.gms.tasks.Task;
 import com.squareup.picasso.Picasso;
-
-import android.Manifest;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -46,127 +50,111 @@ public class WeatherActivity extends AppCompatActivity {
 
     private RelativeLayout homeRL;
     private ProgressBar loadingPB;
-    private TextView cityNameTv,temperatureTV,conditionTV,windTV,cloudTV,humidityTV;
-    private TextInputEditText CityEdit;
-    private ImageView backIV,iconIV,searchIv,countryFlag;
-    private LocationManager locationManager;
+    private TextView cityNameTv, temperatureTV, conditionTV, windTV, cloudTV, humidityTV, CityEdit;
+    private ImageView backIV, iconIV, searchIv, countryFlag;
+    private FusedLocationProviderClient fusedLocationClient;
     private int PERMISSION_CODE = 1;
     private String cityName;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-
-        getWindow().setFlags(WindowManager.LayoutParams.FLAG_LAYOUT_NO_LIMITS,WindowManager.LayoutParams.FLAG_LAYOUT_NO_LIMITS);
-
+        EdgeToEdge.enable(this);
         setContentView(R.layout.activity_weather);
+        ViewCompat.setOnApplyWindowInsetsListener(findViewById(R.id.idRLRoot), (v, insets) -> {
+            Insets systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars());
+            v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom);
+            return insets;
+        });
+
         loadingPB = findViewById(R.id.Loading_id);
         cityNameTv = findViewById(R.id.idTVCityName);
         temperatureTV = findViewById(R.id.idTVTemperature);
         conditionTV = findViewById(R.id.idTVCondition);
-        CityEdit = findViewById(R.id.idETCity);
         backIV = findViewById(R.id.IdIVBack);
         iconIV = findViewById(R.id.idIVIcon);
         searchIv = findViewById(R.id.idTVSearch);
-        windTV =findViewById(R.id.idTVWindTextMetric);
-        cloudTV=findViewById(R.id.idTVCloudTextMetric);
-        humidityTV=findViewById(R.id.idTVCHumidTextMetric);
-        countryFlag=findViewById(R.id.idIVFlag);
-
+        windTV = findViewById(R.id.idTVWindTextMetric);
+        cloudTV = findViewById(R.id.idTVCloudTextMetric);
+        humidityTV = findViewById(R.id.idTVCHumidTextMetric);
+        countryFlag = findViewById(R.id.idIVFlag);
         homeRL = findViewById(R.id.idRLHome);
+        CityEdit = findViewById(R.id.idETCity);
 
-
-
-        locationManager = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
-        if(ActivityCompat.checkSelfPermission(this,Manifest.permission.ACCESS_FINE_LOCATION)!= PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(this,Manifest.permission.ACCESS_COARSE_LOCATION)!=PackageManager.PERMISSION_GRANTED){
-            ActivityCompat.requestPermissions(com.example.krishakai.WeatherActivity.this,new String[]{Manifest.permission.ACCESS_FINE_LOCATION,Manifest.permission.ACCESS_COARSE_LOCATION},PERMISSION_CODE);
-        }
-
-        Location location = locationManager.getLastKnownLocation(LocationManager.NETWORK_PROVIDER);
-        cityName = getCityName(location.getLongitude(),location.getLatitude());
-        getWeatherInfo(cityName);
-
-        setTimeBasedBackground();
+        fusedLocationClient = LocationServices.getFusedLocationProviderClient(this);
+        requestLocationPermission();
 
         searchIv.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 String city = CityEdit.getText().toString().trim(); // Trim the input to remove extra spaces
                 if (city.isEmpty()) {
-                    Toast.makeText(com.example.krishakai.WeatherActivity.this, "Please enter city name", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(WeatherActivity.this, "Please enter city name", Toast.LENGTH_SHORT).show();
                 } else {
                     cityNameTv.setText(city);
                     getWeatherInfo(city);
                 }
             }
         });
-
-
-
     }
 
-    private void setTimeBasedBackground() {
-        Calendar calendar = Calendar.getInstance();
-        Date currentTime = calendar.getTime();
-        SimpleDateFormat sdf = new SimpleDateFormat("HH", Locale.getDefault());
-        String currentHourString = sdf.format(currentTime);
-        int currentHour = Integer.parseInt(currentHourString);
-
-        int dayImage = R.drawable.day;
-        int nightImage = R.drawable.night;
-        int backgroundResource;
-
-        if (currentHour >= 18 || currentHour < 6) {
-            // Night time (6 PM to 6 AM)
-            backgroundResource = nightImage;
+    private void requestLocationPermission() {
+        if (!areLocationPermissionsGranted()) {
+            ActivityCompat.requestPermissions(WeatherActivity.this,
+                    new String[]{Manifest.permission.ACCESS_FINE_LOCATION, Manifest.permission.ACCESS_COARSE_LOCATION},
+                    PERMISSION_CODE);
         } else {
-            // Day time (6 AM to 6 PM)
-            backgroundResource = dayImage;
+            getLastKnownLocation();
         }
-
-        backIV.setImageResource(backgroundResource);
-        backIV.setScaleType(ImageView.ScaleType.CENTER_CROP);
+    }
+    private boolean areLocationPermissionsGranted() {
+        return ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED
+                && ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) == PackageManager.PERMISSION_GRANTED;
     }
 
 
-    @Override
-    public void onRequestPermissionsResult( int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
-        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
-        if(requestCode==PERMISSION_CODE){
-            if(grantResults.length>0 && grantResults[0]==PackageManager.PERMISSION_GRANTED){
-                Toast.makeText(this,"Permission Granted",Toast.LENGTH_SHORT).show();
-            }else{
-                Toast.makeText(this,"Please provide the permission",Toast.LENGTH_SHORT).show();
-                finish();
-            }
-        }
-    }
 
-    private String getCityName(double longitude, double latitude){
-        String cityName = "Not Found";
-        Geocoder gcd = new Geocoder(getBaseContext(), Locale.getDefault());
-        try{
-            List<Address> addresses = gcd.getFromLocation(latitude,longitude,10);
-            for (Address adr: addresses){
-                if(adr!=null){
-                    String city = adr.getLocality();
-                    if( city != null &&  !city.equals("")){
-                        cityName = city;
-                    }
-                    else{
-                        Log.d("TAG","City Not Found");
-                        Toast.makeText(this,"User City Not Found..", Toast.LENGTH_SHORT).show();
+
+    private void getLastKnownLocation() {
+        if (areLocationPermissionsGranted()) {
+            Task<Location> locationTask = fusedLocationClient.getLastLocation();
+            locationTask.addOnSuccessListener(new OnSuccessListener<Location>() {
+                @Override
+                public void onSuccess(Location location) {
+                    if (location != null) {
+                        double latitude = location.getLatitude();
+                        double longitude = location.getLongitude();
+                        cityName = getCityName(longitude, latitude);
+                        getWeatherInfo(cityName);
+                    } else {
+                        // Handle case where location is null
+                        Toast.makeText(WeatherActivity.this, "Unable to fetch location", Toast.LENGTH_SHORT).show();
                     }
                 }
+            });
+        } else {
+            // Handle case where location permission is not granted
+            requestLocationPermission();
+        }
+    }
+
+
+    private String getCityName(double longitude, double latitude) {
+        String cityName = "Not Found";
+        Geocoder gcd = new Geocoder(getBaseContext(), Locale.getDefault());
+        try {
+            List<Address> addresses = gcd.getFromLocation(latitude, longitude, 1);
+            if (addresses != null && addresses.size() > 0) {
+                cityName = addresses.get(0).getLocality();
             }
-        }catch(IOException e){
+        } catch (IOException e) {
             e.printStackTrace();
         }
         return cityName;
     }
 
     private void getWeatherInfo(String cityName) {
-        String url = "https://api.openweathermap.org/data/2.5/weather?q=" + cityName + "&appid=89852f15bebd043e42effdd09d6aef37&units=metric";
+        String url = "https://api.openweathermap.org/data/2.5/weather?q=" + cityName + "&appid=" + WEATHER_KEY + "&units=metric";
         cityNameTv.setText(cityName);
         RequestQueue requestQueue = Volley.newRequestQueue(com.example.krishakai.WeatherActivity.this);
 
@@ -330,5 +318,17 @@ public class WeatherActivity extends AppCompatActivity {
         requestQueue.add(jsonObjectRequest);
     }
 
+    @Override
+    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
+        if (requestCode == PERMISSION_CODE) {
+            if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+                getLastKnownLocation();
+            } else {
+                Toast.makeText(this, "Please provide the location permission", Toast.LENGTH_SHORT).show();
+                finish();
+            }
+        }
+    }
 
 }

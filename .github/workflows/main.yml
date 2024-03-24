@@ -1,0 +1,46 @@
+name: Build and Generate APK
+
+on:
+  push:
+    branches:
+      - master
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    env:
+      GEMINI_KEY: ${{ secrets.GEMINI_KEY }}
+      WEATHER_KEY: ${{ secrets.WEATHER_KEY }}
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v3
+
+      - name: Set up JDK
+        uses: actions/setup-java@v3
+        with:
+          distribution: 'adopt'
+          java-version: '17'
+
+      - name: Display directory structure
+        run: ls -R
+
+      - name: Ensure executable permissions for gradlew
+        run: chmod +x gradlew
+
+      - name: Create local.properties file with API keys
+        run: |
+          echo "GEMINI_KEY=${{ secrets.GEMINI_KEY }}" > local.properties
+          echo "WEATHER_KEY=${{ secrets.WEATHER_KEY }}" >> local.properties
+
+      - name: Build with Gradle
+        run: |
+          source local.properties
+          ./gradlew assembleDebug
+
+      - name: Archive APK artifact
+        uses: actions/upload-artifact@v3
+        with:
+          name: app-debug
+          path: app/build/outputs/apk/debug/

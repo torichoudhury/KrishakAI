@@ -7,7 +7,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="@color/black_shade_1"
-    tools:context=".MainActivity">
+    tools:context=".WeatherActivity">
     <ProgressBar
         android:id="@+id/Loading_id"
         android:layout_width="wrap_content"
@@ -109,13 +109,13 @@
             android:layout_below="@id/idLLEdt"
             android:layout_marginStart="10dp"
             android:layout_marginLeft="10dp"
-            android:layout_marginTop="36dp"
+            android:layout_marginTop="10dp"
             android:layout_marginEnd="10dp"
             android:layout_marginRight="10dp"
             android:layout_marginBottom="10dp"
             android:gravity="center_horizontal"
             android:padding="5dp"
-            android:text="  "
+            android:text="N/A"
             android:textColor="@color/white"
             android:textSize="70dp" />
 
@@ -206,10 +206,10 @@
 
                     android:layout_below="@id/idTVWindText"
                     android:gravity="center_horizontal"
-                    android:text=" "
+                    android:text="N/A"
+                    android:textSize="20dp"
                     android:textAlignment="center"
-                    android:textColor="@color/white"
-                    android:textSize="20dp" />
+                    android:textColor="@color/white" />
 
             </GridLayout>
 
@@ -259,10 +259,10 @@
 
                     android:layout_below="@id/idTVCloudText"
                     android:gravity="center_horizontal"
-                    android:text="  "
+                    android:text="N/A"
                     android:textAlignment="center"
-                    android:textColor="@color/white"
-                    android:textSize="20dp" />
+                    android:textSize="20dp"
+                    android:textColor="@color/white" />
             </GridLayout>
 
             <GridLayout
@@ -309,10 +309,10 @@
 
                     android:layout_below="@id/idTVHumidText"
                     android:gravity="center_horizontal"
-                    android:text="  "
+                    android:text="N/A"
                     android:textAlignment="center"
-                    android:textColor="@color/white"
-                    android:textSize="20dp" />
+                    android:textSize="20dp"
+                    android:textColor="@color/white" />
             </GridLayout>
         </LinearLayout>
 

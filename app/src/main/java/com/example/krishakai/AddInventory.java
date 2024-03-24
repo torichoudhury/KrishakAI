@@ -1,8 +1,18 @@
 package com.example.krishakai;
 
+import static com.example.krishakai.BuildConfig.GEMINI_KEY;
+
+import android.Manifest;
+import android.content.pm.PackageManager;
 import android.content.Intent;
-import android.graphics.Color;
+import android.graphics.Bitmap;
+import android.graphics.Canvas;
+import android.graphics.Paint;
+import android.graphics.Rect;
+import android.graphics.RectF;
+
 import android.os.Bundle;
+import android.provider.MediaStore;
 import android.util.Log;
 import android.view.View;
 import android.view.inputmethod.InputMethodManager;
@@ -10,6 +20,7 @@ import android.widget.ArrayAdapter;
 import android.widget.AutoCompleteTextView;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -20,15 +31,27 @@ import androidx.core.graphics.Insets;
 import androidx.core.view.ViewCompat;
 import androidx.core.view.WindowInsetsCompat;
 
+import com.google.ai.client.generativeai.GenerativeModel;
+import com.google.ai.client.generativeai.java.GenerativeModelFutures;
+import com.google.ai.client.generativeai.type.GenerateContentResponse;
+import com.google.ai.client.generativeai.type.Content;
+import com.google.common.util.concurrent.FutureCallback;
+import com.google.common.util.concurrent.Futures;
+import com.google.common.util.concurrent.ListenableFuture;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 
+import java.util.concurrent.Executor;
+import java.util.concurrent.Executors;
+
 public class AddInventory extends AppCompatActivity {
 
     private static final String TAG = "AddInventory";
+    private static final int REQUEST_IMAGE_CAPTURE = 101;
+    private ImageView imageView;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -47,6 +70,8 @@ public class AddInventory extends AppCompatActivity {
         EditText cost = findViewById(R.id.costInput);
         Button submitbtn = findViewById(R.id.submitbtn);
         TextView chkinv = findViewById(R.id.chkinv);
+        imageView = findViewById(R.id.fruitcap);
+
 
         chkinv.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -73,6 +98,8 @@ public class AddInventory extends AppCompatActivity {
                     item.setText("");
                     quantity.setText("");
                     cost.setText("");
+                    imageView.setImageBitmap(null);
+                    imageView.setBackgroundResource(R.drawable.camera);
                     // Close the keyboard
                     InputMethodManager inputMethodManager = (InputMethodManager) getSystemService(INPUT_METHOD_SERVICE);
                     inputMethodManager.hideSoftInputFromWindow(v.getWindowToken(), 0);
@@ -181,5 +208,106 @@ public class AddInventory extends AppCompatActivity {
                 Log.w(TAG, "Failed to read value for " + userItem, error.toException());
             }
         });
+    }
+
+    public void onImageViewClicked(View view) {
+        if (checkSelfPermission(Manifest.permission.CAMERA) != PackageManager.PERMISSION_GRANTED) {
+            requestPermissions(new String[]{Manifest.permission.CAMERA}, REQUEST_IMAGE_CAPTURE);
+        } else {
+            dispatchTakePictureIntent();
+        }
+    }
+
+    @Override
+    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
+        if (requestCode == REQUEST_IMAGE_CAPTURE) {
+            if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+                dispatchTakePictureIntent();
+            } else {
+                Toast.makeText(this, "Camera permission denied", Toast.LENGTH_SHORT).show();
+            }
+        }
+    }
+
+
+    private void dispatchTakePictureIntent() {
+        Intent takePictureIntent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
+        if (takePictureIntent.resolveActivity(getPackageManager()) != null) {
+            startActivityForResult(takePictureIntent, REQUEST_IMAGE_CAPTURE);
+        }
+    }
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        if (requestCode == REQUEST_IMAGE_CAPTURE && resultCode == RESULT_OK) {
+            GenerativeModel gm = new GenerativeModel("gemini-pro-vision",GEMINI_KEY);
+            GenerativeModelFutures model = GenerativeModelFutures.from(gm);
+
+            Bundle extras = data.getExtras();
+            assert extras != null;
+            Bitmap imageBitmap = (Bitmap) extras.get("data");
+            imageView.setBackground(null);
+            Bitmap roundedBitmap = getRoundedCornerBitmap(imageBitmap, 30); // Adjust the corner radius as needed
+            imageView.setImageBitmap(roundedBitmap);
+
+            Content content = new Content.Builder()
+                    .addText("you will be given a fruit or vegetable image and identify it which fruits or vegetables. one word only and if there is no fruit or vegetable in the picture then just say 'No fruits or vegetable found' ")
+                    .addImage(imageBitmap)
+                    .build();
+
+            Executor executor = Executors.newSingleThreadExecutor();
+            ListenableFuture<GenerateContentResponse> response = model.generateContent(content);
+            Futures.addCallback(response, new FutureCallback<GenerateContentResponse>() {
+                String resultText;
+                @Override
+                public void onSuccess(GenerateContentResponse result) {
+                    resultText = result.getText();
+                    assert resultText != null;
+                    Log.d("YourTag", resultText);
+                    AutoCompleteTextView item = findViewById(R.id.itemsInput);
+
+                    if(resultText.toLowerCase().trim().equals("banana") || resultText.toLowerCase().trim().equals("bananas")) {
+                        item.setText("Bananas");
+                    } else if(resultText.toLowerCase().trim().equals("grape") || resultText.toLowerCase().trim().equals("grapes")){
+                        item.setText("Grapes");
+                    } else if(resultText.toLowerCase().trim().equals("tomato") || resultText.toLowerCase().trim().equals("tomatoes")){
+                        item.setText("Tomatoes");
+                    } else if(resultText.toLowerCase().trim().equals("apple") || resultText.toLowerCase().trim().equals("apples")){
+                        item.setText("Apples");
+                    } else {
+                        // Handle unmatched cases (e.g., Log or display a message)
+                        Log.d("YourTag", "Unmatched fruit: " + resultText);
+                    }
+                }
+
+
+                @Override
+                public void onFailure(Throwable t) {
+                    t.printStackTrace();
+                }
+            }, executor);
+        }
+    }
+
+    private Bitmap getRoundedCornerBitmap(Bitmap bitmap, int cornerRadius) {
+        Bitmap roundedBitmap = Bitmap.createBitmap(bitmap.getWidth(), bitmap.getHeight(), Bitmap.Config.ARGB_8888);
+        Canvas canvas = new Canvas(roundedBitmap);
+
+        final int color = 0xff424242;
+        final Paint paint = new Paint();
+        final Rect rect = new Rect(0, 0, bitmap.getWidth(), bitmap.getHeight());
+        final RectF rectF = new RectF(rect);
+
+        paint.setAntiAlias(true);
+        canvas.drawARGB(0, 0, 0, 0);
+        paint.setColor(color);
+        canvas.drawRoundRect(rectF, cornerRadius, cornerRadius, paint);
+
+        paint.setXfermode(new android.graphics.PorterDuffXfermode(android.graphics.PorterDuff.Mode.SRC_IN));
+        canvas.drawBitmap(bitmap, rect, rect, paint);
+
+        return roundedBitmap;
     }
 }

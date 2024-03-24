@@ -23,6 +23,7 @@ android {
         properties.load(project.rootProject.file("local.properties").inputStream())
 
         buildConfigField("String", "GEMINI_KEY", "\"${properties.getProperty("GEMINI_KEY")}\"")
+        buildConfigField("String", "WEATHER_KEY", "\"${properties.getProperty("WEATHER_KEY")}\"")
     }
 
     buildTypes {
@@ -62,6 +63,7 @@ dependencies {
     implementation("com.google.guava:guava:31.0.1-android")
     implementation("org.reactivestreams:reactive-streams:1.0.4")
     implementation("com.google.android.material:material:1.10.0")
-    implementation("com.squareup.picasso:picasso:2.71828")
-    implementation("com.android.volley:volley:1.2.0")
+    implementation("com.squareup.picasso:picasso:2.8")
+    implementation("com.android.volley:volley:1.2.1")
+    implementation("com.google.android.gms:play-services-location:18.0.0")
 }
