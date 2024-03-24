@@ -19,6 +19,6 @@ dependencyResolutionManagement {
     }
 }
 
-rootProject.name = "KAI"
+rootProject.name = "KrishakAI"
 include(":app")
  

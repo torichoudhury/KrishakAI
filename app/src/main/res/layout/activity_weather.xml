@@ -109,13 +109,13 @@
             android:layout_below="@id/idLLEdt"
             android:layout_marginStart="10dp"
             android:layout_marginLeft="10dp"
-            android:layout_marginTop="10dp"
+            android:layout_marginTop="36dp"
             android:layout_marginEnd="10dp"
             android:layout_marginRight="10dp"
             android:layout_marginBottom="10dp"
             android:gravity="center_horizontal"
             android:padding="5dp"
-            android:text="N/A"
+            android:text="  "
             android:textColor="@color/white"
             android:textSize="70dp" />
 
@@ -206,10 +206,10 @@
 
                     android:layout_below="@id/idTVWindText"
                     android:gravity="center_horizontal"
-                    android:text="N/A"
-                    android:textSize="20dp"
+                    android:text=" "
                     android:textAlignment="center"
-                    android:textColor="@color/white" />
+                    android:textColor="@color/white"
+                    android:textSize="20dp" />
 
             </GridLayout>
 
@@ -259,10 +259,10 @@
 
                     android:layout_below="@id/idTVCloudText"
                     android:gravity="center_horizontal"
-                    android:text="N/A"
+                    android:text="  "
                     android:textAlignment="center"
-                    android:textSize="20dp"
-                    android:textColor="@color/white" />
+                    android:textColor="@color/white"
+                    android:textSize="20dp" />
             </GridLayout>
 
             <GridLayout
@@ -309,10 +309,10 @@
 
                     android:layout_below="@id/idTVHumidText"
                     android:gravity="center_horizontal"
-                    android:text="N/A"
+                    android:text="  "
                     android:textAlignment="center"
-                    android:textSize="20dp"
-                    android:textColor="@color/white" />
+                    android:textColor="@color/white"
+                    android:textSize="20dp" />
             </GridLayout>
         </LinearLayout>
 
