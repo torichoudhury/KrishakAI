@@ -30,10 +30,18 @@ Welcome to Farmer's Helper, an Android application designed to assist farmers wi
 
 ## How to Use
 
+**Run locally:**
 1. Clone the repository to your local machine.
 2. Open the project in Android Studio.
-3. Connect your Android device or use an emulator.
-4. Build and run the Farmer's Helper app.
+3. In local.properties file add GEMINI and WEATHER API like this
+   
+   ```bash
+   GEMINI_KEY=YOUR_GEMINI_API
+   WEATHER_KEY=YOUR_WEATHER_API
+   ```
+   
+4. Connect your Android device or use an emulator.
+5. Build and run the Farmer's Helper app.
 
 ## Contributing
 
