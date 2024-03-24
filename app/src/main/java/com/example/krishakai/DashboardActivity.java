@@ -113,7 +113,7 @@ public class DashboardActivity extends AppCompatActivity {
                             netText.setText("Net Loss: " + val);
                             netplText.setText("" + val);
                             netPLText.setText("Net Loss");
-                            netText.setTextColor(Color.RED);
+                            netText.setTextColor(Color.parseColor("#680000"));
                             netplText.setTextColor(Color.RED);
                             netPLText.setTextColor(Color.RED);
                         } else {
@@ -121,7 +121,7 @@ public class DashboardActivity extends AppCompatActivity {
                             netText.setText("Net Profit: " + val);
                             netplText.setText("" + val);
                             netPLText.setText("Net Profit");
-                            netText.setTextColor(Color.parseColor("#1C9101"));
+                            netText.setTextColor(Color.parseColor("#0D4700"));
                             netplText.setTextColor(Color.parseColor("#1C9101"));
                             netPLText.setTextColor(Color.parseColor("#1C9101"));
                         }
