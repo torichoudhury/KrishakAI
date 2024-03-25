@@ -1,8 +1,16 @@
 [![Build and Generate APK](https://github.com/torichoudhury/KrishakAI/actions/workflows/main.yml/badge.svg)](https://github.com/torichoudhury/KrishakAI/actions/workflows/main.yml) 
 
+<p align="center">
+  <img src="https://github.com/torichoudhury/KrishakAI/blob/master/app/src/main/res/drawable/krisi.png" height="200px" width="200px">
+</p>
+
 # KRISHAKAI 🌾📱
 
 Welcome to **KrishakAI**, an *Android* application designed to assist farmers with various tasks related to crop management, weather tracking, and inventory management. This app aims to empower farmers by providing essential tools and information for efficient farming practices.
+
+## Project Overview 🌟
+### Demo👩‍💻🧑‍💻
+https://vimeo.com/926993854?share=copy
 
 ## Features
 
