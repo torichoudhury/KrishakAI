@@ -9,8 +9,6 @@
 Welcome to **KrishakAI**, an *Android* application designed to assist farmers with various tasks related to crop management, weather tracking, and inventory management. This app aims to empower farmers by providing essential tools and information for efficient farming practices.
 
 ## Project Overview 🌟
-### Demo👩‍💻🧑‍💻
-https://vimeo.com/926993854?share=copy
 
 ## Features
 
